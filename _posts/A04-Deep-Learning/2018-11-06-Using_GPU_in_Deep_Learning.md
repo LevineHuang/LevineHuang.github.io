@@ -7,8 +7,6 @@ categories: Deep-Learning AI
 typora-root-url: ..\..
 ---
 
-{% include lib/mathjax.html%}
-
 TensorFlow如何为运算(operations)分配设备(GPU，CPU)，如何手动改变设备分配编排？
 
 ### 指定使用哪块GPU卡
