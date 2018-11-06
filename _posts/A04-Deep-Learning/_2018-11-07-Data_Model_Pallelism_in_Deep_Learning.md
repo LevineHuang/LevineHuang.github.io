@@ -1,34 +1,19 @@
-### 如何查看设备GPU卡的可用状态
+---
+layout: post
+title:  深度学习中GPU的使用
+date:   2018-11-06 09:00:00 +0800
+tags: Deep-Learning AI GPU
+categories: Deep-Learning AI
+typora-root-url: ..\..
+---
 
- nvidia-smi： NVIDIA System Management Interface 
-
-基于C语言的底层函数库，提供python封装的接口(http://pypi.python.org/pypi/nvidia-ml-py/)。
-
-```python
-try:
-    nvmlDeviceGetCount()
-except NVMLError as error:
-    print(error)
-    
->>> nvmlInit()
->>> handle = nvmlDeviceGetHandleByIndex(0)
->>> (current, pending) = nvmlDeviceGetEccMode(handle)
-
->>> info = nvmlDeviceGetMemoryInfo(handle)
->>> print "Total memory:", info.total
-Total memory: 5636292608
->>> print "Free memory:", info.free
-Free memory: 5578420224
->>> print "Used memory:", info.used
-Used memory: 57872384
-
-```
+{% include lib/mathjax.html%}
 
 
 
-### 如何指定使用GPU卡训练模型
+### 自动选择GPU
 
-### GPU不可用时如何自动切换到CPU
+https://www.leiphone.com/news/201708/eR3oMtztM4vH2bHg.html
 
 ### 如何进行分布式模型训练
 
@@ -47,13 +32,13 @@ Used memory: 57872384
 
    不同的机器有同一个模型的多个副本，每个机器分配到数据的一部分，然后将所有机器的计算结果按照某种方式合并。
 
-   ![](imgs/模型-数据并行化.png) 
+   ![](/assets/imgs/A04/model-data-parallelism-1.png) 
 
 3. 模型并行化与数据并行化结合
 
    假设有一个多GPU集群系统。我们可以在同一台机器上采用模型并行化（在GPU之间切分模型），在机器之间采用数据并行化。 
 
-   ![](imgs/模型-数据并行化2.png)
+   ![](/assets/imgs/A04/model-data-parallelism-2.png)
 
 
 
