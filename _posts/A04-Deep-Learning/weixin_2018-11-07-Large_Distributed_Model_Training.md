@@ -24,7 +24,7 @@ typora-root-url: ..\..
 
 神经网络的分布式训练可以通过两种方式实现：数据并行化（data parallelism）和模型并行化（model parallelism）以及两者结合。
 
-![](/assets/imgs/A04/model-data-parallelism-1.png)
+![](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/model-data-parallelism-1.png)
 
 **数据并行化**
 
@@ -42,7 +42,7 @@ AlexNet 是使用模型并行化的最早期模型之一，其方法是将网络
 
 假设有一个多GPU集群系统。我们可以在同一台机器上采用模型并行化（在GPU之间切分模型），在机器之间采用数据并行化。 
 
-![](/assets/imgs/A04/model-data-parallelism-2.png)
+![](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/model-data-parallelism-2.png)
 
 ### **分布式训练框架的组件**
 
@@ -113,7 +113,7 @@ AlexNet 是使用模型并行化的最早期模型之一，其方法是将网络
 
 ##### **常规的GPU多卡分布式计算的原理**
 
-![img](/assets/imgs/A04/GPU-distributed.jpg)
+![img](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/GPU-distributed.jpg)
 
 GPU1~4卡负责网络参数的训练，每个卡上都布置了相同的深度学习网络，每个卡都分配到不同的数据的mini batch。每张卡训练结束后将网络参数同步到GPU0，也就是Reducer这张卡上，然后求这些梯度的平均来累积这些梯度，从而为权重更新步骤构建出新的全局梯度集，再分发到每张计算卡，整个流程有点像map-reduce的原理。
 
@@ -127,7 +127,7 @@ GPU1~4卡负责网络参数的训练，每个卡上都布置了相同的深度�
 
 将GPU卡的通信模式拼接成一个环形，从而减少随着卡数增加而带来的资源消耗，如下图所示：
 
-![img](/assets/imgs/A04/gpu-ring-all-reduce.jpg)
+![img](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/gpu-ring-all-reduce.jpg)
 
 **存在问题**
 
@@ -141,7 +141,7 @@ GPU1~4卡负责网络参数的训练，每个卡上都布置了相同的深度�
 
 通过批量控制来解决大规模批量训练不稳定的问题。以超过 32K的batch size来训练模型以减少准确率下降，训练期间采用预定的批量变化方案。
 
-![1542329483529](/assets/imgs/A04/suoni-224s.png)
+![1542329483529](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/suoni-224s.png)
 
 ImageNet/ResNet-50 训练的 GPU 扩展效率
 
@@ -149,7 +149,7 @@ ImageNet/ResNet-50 训练的 GPU 扩展效率
 
 在不显著降低准确率的前提下提升 GPU 扩展效率。使用 1088 块 Tesla V100 GPU 实现了 91.62% 的 GPU 扩展效率。
 
-![1542329773508](/assets/imgs/A04/GPU-scaling.png)
+![1542329773508](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/GPU-scaling.png)
 
 **2D-Torus All- reduce拓扑结构**
 
@@ -159,7 +159,7 @@ ImageNet/ResNet-50 训练的 GPU 扩展效率
 
 2D-Torus all-reduce 的交流成本更低。设 N 为集群中的 GPU 数量，X 为水平方向的 GPU 数量，Y 为竖直方向的 GPU 数量。2D-Torus all-reduce 只需执行 2(X-1) 次 GPU-to-GPU 运算。
 
-![1542332408831](/assets/imgs/A04/2D-Torus-topology.png)
+![1542332408831](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/2D-Torus-topology.png)
 
 > 该方案的容错性如何？某个节点出故障会有什么影响，如何解决？
 >
