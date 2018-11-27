@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  Yolo目标检测原理
+title:  论文笔记：Yolo目标检测原理
 date:   2018-11-14 09:00:00 +0800
 tags: Computer-Vision Object-Detection
-categories: Computer-Vision
+categories: Computer-Vision Object-Detection
 typora-root-url: ..
 ---
 
@@ -75,16 +75,15 @@ Yolo算法采用一个单独的CNN模型实现end-to-end的目标检测，首先
 
 #### 目标定位
 
-**置信度**包含两个方面，即 ![Pr(imgs/equation-1539652686470.svg)*\text{IOU}^{truth}_{pred}](https://www.zhihu.com/equation?tex=Pr%28object%29%2A%5Ctext%7BIOU%7D%5E%7Btruth%7D_%7Bpred%7D)：
+边界框的**置信度**包含两个方面:
 
-1. 这个边界框含有目标的可能性大小，记为 ![Pr(imgs/equation-1539652598743.svg)](https://www.zhihu.com/equation?tex=Pr%28object%29) ，当该边界框是背景时（即不包含目标），此时 ![Pr(imgs/equation-1539652598808.svg)=0](https://www.zhihu.com/equation?tex=Pr%28object%29%3D0) 。而当该边界框包含目标时， ![Pr(imgs/equation-1539652598808.svg)=1](https://www.zhihu.com/equation?tex=Pr%28object%29%3D1) 。
-2. 边界框的准确度，记为 ![\text{IOU}^{truth}_{pred}](imgs/equation-1539652621978.svg) ，用预测框与实际框（ground truth）的IOU（intersection over union，交并比）来表征。
+1. 这个边界框含有目标的可能性大小，记为$Pr(object)$ ，当该边界框是背景时（即不包含目标），此时$Pr(object) = 0$  。而当该边界框包含目标时，$Pr(object) = 1$  。
+2. 边界框的准确度，记为 $IOU^{truth}_{pred}$ ，用预测框与实际框（ground truth）的IOU（intersection over union，交并比）来表征。
 
 **边界框的大小与位置**
 
-1. 用4个值来表征： ![(imgs/equation-1539652813274.svg)](https://www.zhihu.com/equation?tex=%28x%2C+y%2Cw%2Ch%29) ，其中 ![(imgs/equation-1539652813272.svg)](https://www.zhihu.com/equation?tex=%28x%2Cy%29) 是边界框的中心坐标，而 ![w](imgs/equation-1539652813273.svg) 和 ![h](imgs/equation-1539652813273.svg) 是边界框的宽与高。中心坐标的预测值 ![(imgs/equation-1539652834212.svg)](https://www.zhihu.com/equation?tex=%28x%2Cy%29) 是相对于每个单元格左上角坐标点的偏移值，并且单位是相对于单元格大小的，单元格的坐标定义如下图所示。而边界框的 ![w](imgs/equation-1539652834219.svg) 和 ![h](imgs/equation-1539825401316.svg) 预测值是相对于整个图片的宽与高的比例，这样理论上4个元素的大小应该在 ![[0,1]](imgs/equation-1539652834259.svg) 范围。
+1. 用4个值来表征：(x,y,w,h) ，其中(x, y)是边界框的中心坐标，而 $w$和h是边界框的宽与高。中心坐标的预测值 ![(imgs/equation-1539652834212.svg)](https://www.zhihu.com/equation?tex=%28x%2Cy%29) 是相对于每个单元格左上角坐标点的偏移值，并且单位是相对于单元格大小的，单元格的坐标定义如下图所示。而边界框的 ![w](imgs/equation-1539652834219.svg) 和 ![h](imgs/equation-1539825401316.svg) 预测值是相对于整个图片的宽与高的比例，这样理论上4个元素的大小应该在 ![[0,1]](imgs/equation-1539652834259.svg) 范围。
 
-   > 为什么中心坐标的预测值（x，y）的大小在[0, 1]范围内？
 
 每个边界框的预测值实际上包含5个元素： ![(imgs/equation-1539825561755.svg)](https://www.zhihu.com/equation?tex=%28x%2Cy%2Cw%2Ch%2Cc%29) ，其中前4个表征边界框的大小与位置，而最后一个值是置信度。
 
@@ -92,23 +91,23 @@ Yolo算法采用一个单独的CNN模型实现end-to-end的目标检测，首先
 
 #### 目标分类
 
-对于每一个单元格其还要给出预测出 ![C](imgs/equation-1539825797712.svg) 个类别概率值，其表征的是由该单元格负责预测的边界框其目标属于各个类别的概率。但是这些概率值其实是在各个边界框置信度下的条件概率，即 ![Pr(imgs/equation-1539825797718.svg)](https://www.zhihu.com/equation?tex=Pr%28class_%7Bi%7D%7Cobject%29) 。值得注意的是，不管一个单元格预测多少个边界框，其只预测一组类别概率值，这是Yolo算法的一个缺点。
+对于每一个单元格其还要给出预测出$C$个类别概率值，其表征的是由该单元格负责预测的边界框其目标属于各个类别的概率。但是这些概率值其实是在各个边界框置信度下的条件概率，即 ![Pr(imgs/equation-1539825797718.svg)](https://www.zhihu.com/equation?tex=Pr%28class_%7Bi%7D%7Cobject%29) 。值得注意的是，不管一个单元格预测多少个边界框，其只预测一组类别概率值，这是Yolo算法的一个缺点。
 
-> 如何从多个边界框中选出一个进行类别预测？这样做有什么坏处？
+> 同一单元格的多个边界框共用一组类别概率值。
 
 各个边界框类别置信度（class-specific confidence scores）: 
-
-![Pr(imgs/equation-1539825959546.svg)*Pr(object)*\text{IOU}^{truth}_{pred}=Pr(class_{i})*\text{IOU}^{truth}_{pred}](https://www.zhihu.com/equation?tex=Pr%28class_%7Bi%7D%7Cobject%29%2APr%28object%29%2A%5Ctext%7BIOU%7D%5E%7Btruth%7D_%7Bpred%7D%3DPr%28class_%7Bi%7D%29%2A%5Ctext%7BIOU%7D%5E%7Btruth%7D_%7Bpred%7D) 。
-
+$$
+Pr(class_i|object) * Pr(object) * IOU^{truth}_{pred} = Pr(class_i) * IOU^{truth}_{pred}
+$$
 边界框类别置信度表征的是该边界框中目标属于各个类别的可能性大小以及边界框匹配目标的好坏。后面会说，一般会根据类别置信度来过滤网络的预测框。
 
 ### 网络设计
 
-Yolo采用卷积网络来提取特征，然后使用全连接层来得到预测值。网络结构参考GooLeNet模型，包含24个卷积层和2个全连接层。对于卷积层，主要使用1x1卷积来做channel reduction，然后紧跟3x3卷积。对于卷积层和全连接层，采用Leaky ReLU激活函数： ![max(imgs/equation-1539909588125.svg)](https://www.zhihu.com/equation?tex=max%28x%2C+0.1x%29) 。但是最后一层却采用线性激活函数。
+Yolo采用卷积网络来提取特征，然后使用全连接层来得到预测值。网络结构参考GooLeNet模型，包含24个卷积层和2个全连接层。对于卷积层，主要使用1x1卷积来做channel reduction，然后紧跟3x3卷积。对于卷积层和全连接层，采用Leaky ReLU激活函数：$max(x, 0.1x)$ 。但是最后一层却采用线性激活函数。
 
 ![img](imgs/v2-5d099287b1237fa975b1c19bacdfc07f_hd.jpg)
 
-网络的最后输出为 ![7\times 7\times 30](imgs/equation-1539909652559.svg) 大小的张量。对于每一个单元格，前20个元素是类别概率值，然后2个元素是边界框置信度，两者相乘可以得到类别置信度，最后8个元素是边界框的 ![(imgs/equation-1539909669659.svg)](https://www.zhihu.com/equation?tex=%28x%2C+y%2Cw%2Ch%29) 。这样排列是为了计算方便，可以方便地提取每一个部分。首先网络的预测值是一个二维张量 ![P](imgs/equation-1539909811819.svg) ，其shape为 ![[batch, 7\times 7\times 30]](imgs/equation-1539909811888.svg) 。采用切片，那么 ![P_{[:,0:7*7*20]}](imgs/equation-1539909811887.svg) 就是类别概率部分，而 ![P_{[:,7*7*20:7*7*(imgs/equation-1539909811887.svg)]}](https://www.zhihu.com/equation?tex=P_%7B%5B%3A%2C7%2A7%2A20%3A7%2A7%2A%2820%2B2%29%5D%7D) 是置信度部分，最后剩余部分 ![P_{[:,7*7*(imgs/equation-1539909811887.svg):]}](https://www.zhihu.com/equation?tex=P_%7B%5B%3A%2C7%2A7%2A%2820%2B2%29%3A%5D%7D) 是边界框的预测结果。这样，提取每个部分是非常方便的，这会方面后面的训练及预测时的计算。
+网络的最后输出为 ![7\times 7\times 30](imgs/equation-1539909652559.svg) 大小的张量。对于每一个单元格，前20个元素是类别概率值，然后2个元素是2个边界框置信度，两者相乘可以得到类别置信度，最后8个元素是2个边界框的 ![(imgs/equation-1539909669659.svg)](https://www.zhihu.com/equation?tex=%28x%2C+y%2Cw%2Ch%29) 。这样排列是为了计算方便，可以方便地提取每一个部分。首先网络的预测值是一个二维张量 ![P](imgs/equation-1539909811819.svg) ，其shape为 ![[batch, 7\times 7\times 30]](imgs/equation-1539909811888.svg) 。采用切片，那么 ![P_{[:,0:7*7*20]}](imgs/equation-1539909811887.svg) 就是类别概率部分，而 ![P_{[:,7*7*20:7*7*(imgs/equation-1539909811887.svg)]}](https://www.zhihu.com/equation?tex=P_%7B%5B%3A%2C7%2A7%2A20%3A7%2A7%2A%2820%2B2%29%5D%7D) 是置信度部分，最后剩余部分 ![P_{[:,7*7*(imgs/equation-1539909811887.svg):]}](https://www.zhihu.com/equation?tex=P_%7B%5B%3A%2C7%2A7%2A%2820%2B2%29%3A%5D%7D) 是边界框的预测结果。这样，提取每个部分是非常方便的，这会方面后面的训练及预测时的计算。
 
 ### 网络训练
 
@@ -150,11 +149,18 @@ Yolo算法将目标检测看成回归问题，所以采用的是均方差损失�
 
 #### Yolo的预测过程
 
-这里我们不考虑batch，认为只是预测一张输入图片。根据前面的分析，最终的网络输出是 ![7\times 7 \times 30](imgs/equation-1539912719162.svg) ，但是我们可以将其分割成三个部分：类别概率部分为 ![[7, 7, 20]](imgs/equation-1539912719160.svg) ，置信度部分为 ![[7,7,2]](imgs/equation-1539912719160.svg) ，而边界框部分为 ![[7,7,2,4]](imgs/equation-1539912719158.svg) （对于这部分不要忘记根据原始图片计算出其真实值）。然后将前两项相乘（矩阵 ![[7, 7, 20]](imgs/equation-1539912719160.svg) 乘以 ![[7,7,2]](imgs/equation-1539912719160.svg) 可以各补一个维度来完成 ![[7,7,1,20]\times [7,7,2,1]](imgs/equation-1539912719161.svg) ）可以得到类别置信度值为 ![[7, 7,2,20]](imgs/equation-1539912719160.svg) ，这里总共预测了 ![7*7*2=98](imgs/equation-1539912719161.svg) 个边界框。
+这里我们不考虑batch，认为只是预测一张输入图片。根据前面的分析，最终的网络输出是[7,7,30] ，但是我们可以将其分割成三个部分：类别概率部分为[7,7,20] ，置信度部分为[7,7,2]，而边界框部分为[7,7,2,4]（对于这部分不要忘记根据原始图片计算出其真实值）。然后将前两项相乘（矩阵 [7, 7, 20] 乘以 [7,7,2] 可以各补一个维度来完成$[7,7,1,20]\times [7,7,2,1]$可以得到类别置信度值为[7, 7,2,20]，这里总共预测了7\*7\*2=98个边界框。
 
-所有的准备数据已经得到了，那么我们先说第一种策略来得到检测框的结果，我认为这是最正常与自然的处理。首先，对于每个预测框根据类别置信度选取置信度最大的那个类别作为其预测标签，经过这层处理我们得到各个预测框的预测类别及对应的置信度值，其大小都是 ![[7,7,2]](https://www.zhihu.com/equation?tex=%5B7%2C7%2C2%5D) 。一般情况下，会设置置信度阈值，就是将置信度小于该阈值的box过滤掉，所以经过这层处理，剩余的是置信度比较高的预测框。最后再对这些预测框使用NMS算法，最后留下来的就是检测结果。一个值得注意的点是NMS是对所有预测框一视同仁，还是区分每个类别，分别使用NMS。Ng在deeplearning.ai中讲应该区分每个类别分别使用NMS，但是看了很多实现，其实还是同等对待所有的框，我觉得可能是不同类别的目标出现在相同位置这种概率很低吧。
+**预测结果筛选方法**
 
-上面的预测方法应该非常简单明了，但是对于Yolo算法，其却采用了另外一个不同的处理思路（至少从C源码看是这样的），其区别就是先使用NMS，然后再确定各个box的类别。其基本过程如图12所示。对于98个boxes，首先将小于置信度阈值的值归0，然后分类别地对置信度值采用NMS，这里NMS处理结果不是剔除，而是将其置信度值归为0。最后才是确定各个box的类别，当其置信度值不为0时才做出检测结果输出。这个策略不是很直接，但是貌似Yolo源码就是这样做的。Yolo论文里面说NMS算法对Yolo的性能是影响很大的，所以可能这种策略对Yolo更好。但是我测试了普通的图片检测，两种策略结果是一样的。
+方法一：
+
+1. 设置置信度阈值，将置信度小于该阈值的box过滤掉；
+2. 对于剩下的执行度比较高的预测框，采用NMS算法过滤。不同类别的目标可能出现在相同位置时，需区分每个类别分别使用NMS。
+
+方法二：
+
+1. 将小于置信度阈值的值归0，然后分类别地对预测框采用NMS算法过滤。Yolo论文采用该方法，且提到NMS算法对Yolo的性能是影响很大。
 
 ### 算法性能分析
 
@@ -172,7 +178,7 @@ Yolo算法将目标检测看成回归问题，所以采用的是均方差损失�
 
 Yolo与Fast R-CNN的误差对比分析如下图所示：
 
-![img](imgs/v2-cb8bb72fad701466328b386da6a93943_hd.jpg)图13 Yolo与Fast R-CNN的误差对比分析
+![img](imgs/v2-cb8bb72fad701466328b386da6a93943_hd.jpg)图13 Yolo与Fast R-<center>CNN的误差对比分析<center/>
 
 可以看到，Yolo的Correct的是低于Fast R-CNN。另外Yolo的Localization误差偏高，即定位不是很准确。但是Yolo的Background误差很低，说明其对背景的误判率较低。Yolo的那篇文章中还有更多性能对比，感兴趣可以看看。
 
@@ -187,13 +193,9 @@ Yolo与Fast R-CNN的误差对比分析如下图所示：
 缺点：
 
 - Yolo各个单元格仅仅预测两个边界框，而且属于一个类别。
-- 如果一个单元格内存在多个目标怎么办，其实这时候Yolo算法就只能选择其中一个来训练。
+- 如果一个单元格内存在多个目标，Yolo算法只能选择其中一个来训练。
 - 对于小物体，Yolo的表现会不如人意。这方面的改进可以看SSD，其采用多尺度单元格。也可以看Faster R-CNN，其采用了anchor boxes。
 - Yolo对于在物体的宽高比方面泛化率低，就是无法定位不寻常比例的物体。当然Yolo的定位不准确也是很大的问题。
-
-### 小结
-
-
 
 ### 参考
 

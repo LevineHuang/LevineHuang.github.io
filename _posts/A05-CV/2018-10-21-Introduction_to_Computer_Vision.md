@@ -1,4 +1,13 @@
-[TOC]
+---
+layout: post
+title:  计算机视觉概述
+date:   2018-10-22 09:00:00 +0800
+tags: Computer-Vision
+categories: Computer-Vision
+typora-root-url: ..
+---
+
+介绍计算机视觉的定义、主要的研究目标与挑战及其应用场景。
 
 ### 计算机视觉的定义
 

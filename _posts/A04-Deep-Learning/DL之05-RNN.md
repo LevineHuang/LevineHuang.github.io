@@ -1,5 +1,31 @@
+循环神经网络(Recurrent Neural Networks，RNNs)已经在众多自然语言处理(Natural Language Processing, NLP)中取得了巨大成功以及广泛应用。
+
+### RNNs的基本介绍
+
+### 常见的RNNs原理
+
+### RNNs常用的训练算法
+
+#### Back Propagation Through Time(BPTT)
+
+#### Real-time Recurrent Learning(RTRL)
+
+#### Extended Kalman Filter(EKF)
+
+### 梯度消失问题(vanishing gradient problem) 
+
+梯度消失问题最早由Sepp Hochreiter于1991年发现。
+
+### Long Short-Term Memory(LSTM，长短时记忆网络)
+
+### Clockwork RNNs(CW-RNNs，时钟频率驱动循环神经网络)
+
+
+
+
 
 ###  Language Model
+
 to predict the probability of observing the sentence (in a given dataset) as:
 
 \begin{aligned}  P(w_1,...,w_m) = \prod_{i=1}^{m} P(w_i \mid w_1,..., w_{i-1})  \end{aligned}
