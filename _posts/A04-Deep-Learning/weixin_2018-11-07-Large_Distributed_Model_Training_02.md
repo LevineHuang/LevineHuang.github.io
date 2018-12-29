@@ -1,3 +1,16 @@
+---
+layout: post
+title:  TensorFlow分布式模型训练原理
+date:   2018-11-06 09:00:00 +0800
+tags: Deep-Learning AI GPU
+categories: Deep-Learning AI
+typora-root-url: ..\..
+---
+
+{% include lib/mathjax.html%}
+
+### TensorFlow分布式模型训练原理
+
 distributed tensorflow可以利用分布式来更好的并行利用大量的计算资源来实现数据并行，提高数据吞吐率以及training的速度。如下图所示，用分布式tensorflow来并行计算和训练模型，从25个GPU扩展到200个GPU，数据的吞吐量也从500 Images/s显著提高到2000 Images/s以上。
 
 ![img](https://raw.githubusercontent.com/levinehuang/LevineHuang.github.io/master/assets/imgs/A04/distributed_tensorflow.PNG)
